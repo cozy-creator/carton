@@ -1,8 +1,7 @@
 [package]
 name = "carton"
-version = "0.1.0"
-authors = ["Abdul"]
 edition = "2021"
+version.workspace = true
 
 [dependencies]
 carton-core = { path = "../core" }
