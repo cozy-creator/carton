@@ -1,0 +1,16 @@
+[package]
+name = "carton-core"
+edition = "2021"
+version.workspace = true
+
+
+[dependencies]
+dirs = "4.0.0"
+toml = "0.7.2"
+sui = { git = "https://github.com/MystenLabs/sui", rev = "2062d2f34912c84fc699f1a2a6e1d485c7f56f79"  }
+sui-keys = { git = "https://github.com/MystenLabs/sui", rev = "2062d2f34912c84fc699f1a2a6e1d485c7f56f79"  }
+sui-json-rpc-types = { git = "https://github.com/MystenLabs/sui", rev = "2062d2f34912c84fc699f1a2a6e1d485c7f56f79"  }
+
+sui-types.workspace = true
+anyhow.workspace = true
+move-package.workspace = true
