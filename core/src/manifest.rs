@@ -157,7 +157,7 @@ fn parse_members(value: TomlValue) -> Result<Members> {
 
                     for member in v.into_iter() {
                         let path = parse_string(member)?;
-                        let name = get_move_package_name(&path).unwrap();
+                        let name = get_move_package_name(&path)?;
 
                         map.insert(name, path);
                     }
