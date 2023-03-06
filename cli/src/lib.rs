@@ -3,6 +3,7 @@ use clap::Parser;
 use cmd::{build::Build, create::Create, init::Init, publish::Publish};
 
 pub mod cmd;
+pub mod template;
 
 #[derive(Parser)]
 #[clap(author, version)]

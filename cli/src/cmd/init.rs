@@ -1,42 +1,32 @@
 use anyhow::{bail, Ok, Result};
 use clap::Parser;
-use std::{fs, io::Write};
+use std::{fs, io::Write, path::Path};
 
 use carton_core::{manifest, path};
 
-#[derive(Parser)]
-/// Initialize Carton in an existing directory
-pub struct Init {}
+use crate::template;
 
-const DEVNET_ENV_LINE: &str = "devnet = { url = \"https://fullnode.devnet.sui.io/\" }";
-const TESTNET_ENV_LINE: &str = "testnet = { url = \"https://fullnode.testnet.sui.io/\" }";
+#[derive(Parser)]
+/// Initialize Carton.toml in an existing directory
+pub struct Init {}
 
 impl Init {
     pub fn execute(self) -> Result<()> {
-        let path = path::get_current_path()?.join(manifest::CARTON_MANIFEST_FILE_NAME);
+        let path = path::get_current_path()?;
+        Self::init_carton(&path, true)?;
 
-        if !path.is_file() {
-            let mut file = fs::File::create(&path)?;
+        Ok(())
+    }
 
-            write!(
-                file,
-                "
-[provider]
-address = \"0x0\"
-env = \"devnet\"
-config = \"~/.sui/sui_config/client.yaml\"
+    pub fn init_carton(path: &Path, force: bool) -> Result<()> {
+        let path = path.join(manifest::CARTON_MANIFEST_FILE_NAME);
 
-[envs]
-"
-            )?;
-            writeln!(
-                file,
-                "{}",
-                format_args!("{}\n{}", DEVNET_ENV_LINE, TESTNET_ENV_LINE)
-            )?;
-        } else {
+        if path.is_file() && !force {
             bail!("Carton has already been initialized in this directory")
         }
+
+        let mut file = fs::File::create(&path)?;
+        file.write_all(template::CARTON_MANIFEST_TEMPLATE.as_bytes())?;
 
         Ok(())
     }
