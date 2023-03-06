@@ -4,10 +4,14 @@ use anyhow::{bail, Ok, Result};
 
 use crate::manifest;
 
+pub fn get_current_path() -> Result<PathBuf> {
+    Ok(env::current_dir()?)
+}
+
 pub fn get_root_path(path: Option<PathBuf>) -> Result<PathBuf> {
     let path = match path {
         Some(path) => path,
-        _ => env::current_dir()?,
+        _ => get_current_path()?,
     };
 
     let mut current = path.to_path_buf();
