@@ -12,3 +12,4 @@ sui-move = { git = "https://github.com/MystenLabs/sui", features = ["build"], re
 anyhow.workspace = true
 move-package.workspace = true
 sui-types.workspace = true
+colored = "2.0.0"
