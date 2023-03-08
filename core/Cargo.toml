@@ -14,3 +14,4 @@ sui-json-rpc-types = { git = "https://github.com/MystenLabs/sui", rev = "2062d2f
 sui-types.workspace = true
 anyhow.workspace = true
 move-package.workspace = true
+glob = "0.3.1"
