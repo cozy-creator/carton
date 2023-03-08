@@ -7,4 +7,5 @@ version = "0.0.1-alpha"
 [workspace.dependencies]
 anyhow = "1.0.69"
 move-package = { git = "https://github.com/move-language/move", rev = "7343821f67c070d28dcdb5bf7d2e07ced046b52f" }
-sui-types = { git = "https://github.com/MystenLabs/sui", rev = "2062d2f34912c84fc699f1a2a6e1d485c7f56f79"  }
+sui-types = { git = "https://github.com/MystenLabs/sui", rev = "f5e66118e3fc80b2fb330444834a85b8aa9896ad"  }
+colored = "2.0.0"
