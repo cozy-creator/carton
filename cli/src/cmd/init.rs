@@ -1,6 +1,6 @@
 use anyhow::{bail, Ok, Result};
 use clap::Parser;
-use std::{fs, io::Write, path::Path};
+use std::{fs::File, io::Write};
 
 use carton_core::{manifest, path};
 
@@ -8,24 +8,20 @@ use crate::template;
 
 #[derive(Parser)]
 /// Initialize Carton.toml in an existing directory
-pub struct Init {}
+pub struct Init {
+    #[clap(long)]
+    force: bool,
+}
 
 impl Init {
     pub fn execute(self) -> Result<()> {
-        let path = path::get_current_path()?;
-        Self::init_carton(&path, true)?;
+        let file_path = path::get_current_path()?.join(manifest::CARTON_MANIFEST_FILE_NAME);
 
-        Ok(())
-    }
-
-    pub fn init_carton(path: &Path, force: bool) -> Result<()> {
-        let path = path.join(manifest::CARTON_MANIFEST_FILE_NAME);
-
-        if path.is_file() && !force {
+        if file_path.is_file() && !self.force {
             bail!("Carton has already been initialized in this directory")
         }
 
-        let mut file = fs::File::create(&path)?;
+        let mut file = File::create(&file_path)?;
         file.write_all(template::CARTON_MANIFEST_TEMPLATE.as_bytes())?;
 
         Ok(())

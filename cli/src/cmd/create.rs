@@ -1,9 +1,11 @@
+use std::{fs::File, io::Write};
+
 use anyhow::{Ok, Result};
+use carton_core::{manifest, path};
 use clap::Parser;
-use std::env;
 use sui_move::new::New as NewPackage;
 
-use super::init::Init;
+use crate::template;
 
 #[derive(Parser)]
 /// Create a move package and initialize Carton.toml
@@ -14,14 +16,22 @@ pub struct Create {
 
 impl Create {
     pub fn execute(self) -> Result<()> {
-        let name = self.new.new.name.clone();
-        let path = env::current_dir()?;
+        let current_path = path::get_current_path()?;
+        let package_path = path::get_current_path()?.join(self.new.new.name.clone());
 
         self.new
-            .execute(Some(path.clone()))
+            .execute(Some(package_path.to_path_buf()))
             .expect("An error occured while generating package");
 
-        Init::init_carton(&path.join(name), false)?;
+        if !current_path
+            .join(manifest::CARTON_MANIFEST_FILE_NAME)
+            .is_file()
+        {
+            let file_path = package_path.join(manifest::CARTON_MANIFEST_FILE_NAME);
+
+            let mut file = File::create(&file_path)?;
+            file.write_all(template::CARTON_MANIFEST_TEMPLATE.as_bytes())?;
+        }
 
         Ok(())
     }
