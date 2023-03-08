@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, rc::Rc};
 
 use anyhow::{bail, Ok, Result};
 use sui::{
@@ -9,16 +9,18 @@ use sui_types::base_types::SuiAddress;
 
 use crate::manifest::{Envs, Manifest};
 
+type StateManifest = Rc<Manifest>;
+
 pub struct State {
-    manifest: Manifest,
+    manifest: StateManifest,
     pub root_path: PathBuf,
     pub context: WalletContext,
 }
 
 impl State {
     pub async fn load(path: PathBuf) -> Result<Self> {
-        let manifest = Manifest::parse_from_path(&path)?;
-        let context = get_context(manifest.clone()).await;
+        let manifest = Rc::new(Manifest::parse_from_path(&path)?);
+        let context = get_context(Rc::clone(&manifest)).await;
 
         Ok(Self {
             context,
@@ -31,7 +33,7 @@ impl State {
         set_active_address(&mut self.context.config, address);
     }
 
-    pub fn set_active_env(&mut self, env: String) {
+    pub fn set_active_env(&mut self, env: &str) {
         set_active_env(&mut self.context.config, env);
     }
 
@@ -50,34 +52,30 @@ impl State {
     }
 }
 
-async fn get_context(
-    Manifest {
-        envs,
-        provider,
-        members: _,
-    }: Manifest,
-) -> WalletContext {
-    let mut context = WalletContext::new(&provider.config, None).await.unwrap();
+async fn get_context(manifest: StateManifest) -> WalletContext {
+    let mut context = WalletContext::new(&manifest.provider.config, None)
+        .await
+        .unwrap();
 
-    if let Some(envs) = envs {
+    if let Some(envs) = &manifest.envs {
         set_envs(&mut context.config, envs);
     }
 
-    set_active_env(&mut context.config, provider.env);
-    set_active_address(&mut context.config, provider.address);
+    set_active_env(&mut context.config, &manifest.provider.env);
+    set_active_address(&mut context.config, manifest.provider.address);
 
     context
 }
 
-fn set_envs(config: &mut PersistedConfig<SuiClientConfig>, envs: Envs) {
+fn set_envs(config: &mut PersistedConfig<SuiClientConfig>, envs: &Envs) {
     for (key, value) in envs.into_iter() {
-        if let Some(idx) = config.envs.iter().position(|e| e.alias == key) {
+        if let Some(idx) = config.envs.iter().position(|e| &e.alias == key) {
             config.envs.remove(idx);
         };
 
         config.add_env(SuiEnv {
-            alias: key,
-            rpc: value.url,
+            alias: key.to_string(),
+            rpc: value.url.to_string(),
             ws: None,
         });
     }
@@ -87,6 +85,6 @@ fn set_active_address(config: &mut PersistedConfig<SuiClientConfig>, address: Su
     config.active_address = Some(address);
 }
 
-fn set_active_env(config: &mut PersistedConfig<SuiClientConfig>, env: String) {
-    config.active_env = Some(env);
+fn set_active_env(config: &mut PersistedConfig<SuiClientConfig>, env: &str) {
+    config.active_env = Some(env.to_string());
 }

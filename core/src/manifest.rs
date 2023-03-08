@@ -22,7 +22,6 @@ pub const CARTON_MANIFEST_FILE_NAME: &str = "Carton.toml";
 pub type Envs = BTreeMap<String, Env>;
 pub type Members = BTreeMap<String, String>;
 
-#[derive(Clone)]
 pub struct Manifest {
     pub envs: Option<Envs>,
     pub provider: Provider,

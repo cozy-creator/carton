@@ -45,7 +45,7 @@ impl Publish {
         let mut state = State::load(root_path.to_path_buf()).await?;
 
         if let Some(env) = self.options.env {
-            state.set_active_env(env);
+            state.set_active_env(&env);
         }
 
         if let Some(publisher) = self.options.publisher {
