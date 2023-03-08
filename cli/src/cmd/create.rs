@@ -19,9 +19,7 @@ impl Create {
         let current_path = path::get_current_path()?;
         let package_path = path::get_current_path()?.join(self.new.new.name.clone());
 
-        self.new
-            .execute(Some(package_path.to_path_buf()))
-            .expect("An error occured while generating package");
+        self.new.execute(Some(package_path.to_path_buf()))?;
 
         if !current_path
             .join(manifest::CARTON_MANIFEST_FILE_NAME)
