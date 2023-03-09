@@ -1,3 +1,5 @@
+use std::env;
+
 use anyhow::Result;
 use clap::Parser;
 use move_package::BuildConfig;
@@ -22,7 +24,7 @@ impl Build {
 
         let package_path = match package {
             Some(package) => state.get_package_path(package)?,
-            None => root_path,
+            None => env::current_dir()?,
         };
 
         self.build.execute(Some(package_path), self.build_config)

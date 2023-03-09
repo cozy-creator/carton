@@ -1,3 +1,5 @@
+use std::env;
+
 use anyhow::{Ok, Result};
 use clap::Parser;
 use move_package::BuildConfig;
@@ -54,7 +56,7 @@ impl Publish {
 
         let package_path = match package {
             Some(package) => state.get_package_path(package)?,
-            None => root_path,
+            None => env::current_dir()?,
         };
 
         actions::publish_package(package_path, &mut state.context, self.build_config).await?;
