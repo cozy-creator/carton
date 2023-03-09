@@ -1,6 +1,5 @@
 use std::process;
 
-use carton;
 use colored::Colorize;
 
 #[tokio::main]

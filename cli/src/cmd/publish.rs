@@ -41,8 +41,8 @@ pub struct PublishOptions {
 
 impl Publish {
     pub async fn execute(self, package: Option<String>) -> Result<()> {
-        let root_path = path::get_root_path(None).unwrap();
-        let mut state = State::load(root_path.to_path_buf()).await?;
+        let root_path = path::get_root_path()?;
+        let mut state = State::load(&root_path).await?;
 
         if let Some(env) = self.options.env {
             state.set_active_env(&env);

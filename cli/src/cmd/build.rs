@@ -17,8 +17,8 @@ pub struct Build {
 
 impl Build {
     pub async fn execute(self, package: Option<String>) -> Result<()> {
-        let root_path = path::get_root_path(None)?;
-        let state = State::load(root_path.to_path_buf()).await?;
+        let root_path = path::get_root_path()?;
+        let state = State::load(&root_path).await?;
 
         let package_path = match package {
             Some(package) => state.get_package_path(package)?,

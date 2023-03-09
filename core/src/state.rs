@@ -1,4 +1,4 @@
-use std::{path::PathBuf, rc::Rc};
+use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Ok, Result};
 use sui::{
@@ -9,24 +9,17 @@ use sui_types::base_types::SuiAddress;
 
 use crate::manifest::{Envs, Manifest};
 
-type StateManifest = Rc<Manifest>;
-
 pub struct State {
-    manifest: StateManifest,
-    pub root_path: PathBuf,
+    manifest: Manifest,
     pub context: WalletContext,
 }
 
 impl State {
-    pub async fn load(path: PathBuf) -> Result<Self> {
-        let manifest = Rc::new(Manifest::parse_from_path(&path)?);
-        let context = get_context(Rc::clone(&manifest)).await;
+    pub async fn load(path: &Path) -> Result<Self> {
+        let manifest = Manifest::parse_from_path(path)?;
+        let context = get_context(&manifest).await;
 
-        Ok(Self {
-            context,
-            manifest,
-            root_path: path,
-        })
+        Ok(Self { context, manifest })
     }
 
     pub fn set_active_address(&mut self, address: SuiAddress) {
@@ -40,7 +33,7 @@ impl State {
     pub fn get_package_path(&self, package_name: String) -> Result<PathBuf> {
         if let Some(members) = &self.manifest.members {
             match members.get(&package_name) {
-                Some(package_path) => Ok(self.root_path.join(package_path)),
+                Some(package_path) => Ok(package_path.to_path_buf()),
                 None => bail!(
                     "The package \"{}\" cannot not found in the current workspace",
                     package_name
@@ -52,7 +45,7 @@ impl State {
     }
 }
 
-async fn get_context(manifest: StateManifest) -> WalletContext {
+async fn get_context(manifest: &Manifest) -> WalletContext {
     let mut context = WalletContext::new(&manifest.provider.config, None)
         .await
         .unwrap();
@@ -68,7 +61,7 @@ async fn get_context(manifest: StateManifest) -> WalletContext {
 }
 
 fn set_envs(config: &mut PersistedConfig<SuiClientConfig>, envs: &Envs) {
-    for (key, value) in envs.into_iter() {
+    for (key, value) in envs.iter() {
         if let Some(idx) = config.envs.iter().position(|e| &e.alias == key) {
             config.envs.remove(idx);
         };

@@ -6,11 +6,10 @@ use std::{
 };
 
 use anyhow::{bail, format_err, Context, Ok, Result};
-use glob::glob;
 use sui_types::base_types::SuiAddress;
 use toml::Value as TomlValue;
 
-use crate::path;
+use crate::path::{self, get_root_path};
 
 const ENVS_NAME: &str = "envs";
 const PROVIDER_NAME: &str = "provider";
@@ -20,7 +19,7 @@ pub const MOVE_MANIFEST_FILE_NAME: &str = "Move.toml";
 pub const CARTON_MANIFEST_FILE_NAME: &str = "Carton.toml";
 
 pub type Envs = BTreeMap<String, Env>;
-pub type Members = BTreeMap<String, String>;
+pub type Members = BTreeMap<String, PathBuf>;
 
 pub struct Manifest {
     pub envs: Option<Envs>,
@@ -59,15 +58,15 @@ fn parse_manifest_value(value: TomlValue) -> Result<Manifest> {
     match value {
         TomlValue::Table(mut value) => {
             let envs = value.remove(ENVS_NAME).map(parse_envs).transpose()?;
+            let members = value
+                .remove(WORKSPACE_NAME)
+                .map(parse_members)
+                .transpose()?;
             let provider = value
                 .remove(PROVIDER_NAME)
                 .map(parse_provider)
                 .transpose()?
                 .context("Error parsing the [provider] section of the Carton manifest")?;
-            let members = value
-                .remove(WORKSPACE_NAME)
-                .map(parse_members)
-                .transpose()?;
 
             Ok(Manifest {
                 envs,
@@ -145,25 +144,26 @@ fn parse_members(value: TomlValue) -> Result<Members> {
             .remove("members")
             .map(|v| match v {
                 TomlValue::Array(v) => {
+                    let root_path = get_root_path()?;
                     let mut map = BTreeMap::new();
 
                     for member in v.into_iter() {
-                        let member_path = parse_string(member)?;
+                        let path_string = parse_string(member)?;
 
-                        if member_path.contains("*") {
-                            let entries = glob(&member_path)?;
-                            for entry in entries {
-                                let entry = entry?;
+                        if path_string.contains("*") {
+                            let paths = path::expand_glob(&root_path, &path_string)?;
 
-                                if entry.is_dir() {
-                                    let path = entry.to_str().unwrap();
+                            for path in paths {
+                                if path.is_dir() {
                                     let name = get_move_package_name(&path)?;
-                                    map.insert(name, path.to_string());
+                                    map.insert(name, path);
                                 }
                             }
                         } else {
-                            let name = get_move_package_name(&member_path)?;
-                            map.insert(name, member_path);
+                            let package_path = root_path.join(&path_string);
+                            let name = get_move_package_name(&package_path)?;
+
+                            map.insert(name, package_path);
                         }
                     }
 
@@ -210,11 +210,8 @@ fn parse_string(value: TomlValue) -> Result<String> {
     }
 }
 
-fn get_move_package_name(package_path: &str) -> Result<String> {
-    let mut path = path::get_root_path(None)
-        .unwrap()
-        .join(package_path)
-        .join(MOVE_MANIFEST_FILE_NAME);
+fn get_move_package_name(package_path: &Path) -> Result<String> {
+    let mut path = package_path.join(MOVE_MANIFEST_FILE_NAME);
 
     if !path.is_file() {
         path.pop();

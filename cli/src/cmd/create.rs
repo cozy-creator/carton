@@ -1,7 +1,7 @@
-use std::{fs::File, io::Write};
+use std::{env, fs::File, io::Write};
 
 use anyhow::{Ok, Result};
-use carton_core::{manifest, path};
+use carton_core::manifest;
 use clap::Parser;
 use sui_move::new::New as NewPackage;
 
@@ -16,8 +16,8 @@ pub struct Create {
 
 impl Create {
     pub fn execute(self) -> Result<()> {
-        let current_path = path::get_current_path()?;
-        let package_path = path::get_current_path()?.join(self.new.new.name.clone());
+        let current_path = env::current_dir()?;
+        let package_path = current_path.join(self.new.new.name.clone());
 
         self.new.execute(Some(package_path.to_path_buf()))?;
 
