@@ -22,7 +22,7 @@ To install Carton on your machine, you might need to install some prerequisites 
 
 The prerquisites are the same as Sui's, So if you have Sui installed on your machine already you can skip this step.
 
-If you do not have Sui installed, use the like below to learn how to install them:
+If you do not have Sui installed, use the link below to learn how to install them:
 
 https://docs.sui.io/build/install#prerequisites
 
@@ -63,7 +63,7 @@ devnet = { url = "https://fullnode.devnet.sui.io:443/" }
 testnet = { url = "https://fullnode.testnet.sui.io:443/" }
 ```
 
-No, let's go through some of the sections of the `Carton.toml` file
+Now, let's go through some of the sections of the `Carton.toml` file
 
 ### Provider [provider]
 
