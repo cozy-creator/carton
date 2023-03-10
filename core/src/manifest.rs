@@ -150,7 +150,7 @@ fn parse_members(value: TomlValue) -> Result<Members> {
                     for member in v.into_iter() {
                         let path_string = parse_string(member)?;
 
-                        if path_string.contains("*") {
+                        if path::is_glob_pattern(&path_string) {
                             let paths = path::expand_glob(&root_path, &path_string)?;
 
                             for path in paths {

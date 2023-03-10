@@ -17,6 +17,10 @@ pub fn expand_glob(base_path: &Path, pattern: &str) -> Result<Vec<PathBuf>> {
     Ok(paths)
 }
 
+pub fn is_glob_pattern(pattern: &str) -> bool {
+    pattern.contains(&['*', '?', '[', ']'][..])
+}
+
 pub fn get_root_path() -> Result<PathBuf> {
     let mut current = env::current_dir()?;
 
