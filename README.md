@@ -214,4 +214,4 @@ PUBLISHED SUCCESSFULLY 🥳
 
 ### Found a bug?
 
-Please raise an issue providing some information about it.
+Please raise an issue providing some information about it [here](https://github.com/bytedeveloperr/carton/issues/new).
