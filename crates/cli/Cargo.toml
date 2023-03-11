@@ -1,6 +1,8 @@
 [package]
 name = "carton"
 edition = "2021"
+
+authors.workspace = true
 version.workspace = true
 
 [dependencies]

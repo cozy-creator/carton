@@ -1,8 +1,9 @@
 [package]
 name = "carton-core"
 edition = "2021"
-version.workspace = true
 
+authors.workspace = true
+version.workspace = true
 
 [dependencies]
 dirs = "4.0.0"

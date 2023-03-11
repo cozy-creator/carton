@@ -1,8 +1,9 @@
 [workspace]
-members = ["cli", "core"]
+members = ["crates/*"]
 
 [workspace.package]
-version = "0.0.1-alpha"
+version = "0.0.2-alpha"
+authors = ["Abdulrahman Yusuf <abdulrahmanyusuf125@gmail.com>"]
 
 [workspace.dependencies]
 anyhow = "1.0.69"
