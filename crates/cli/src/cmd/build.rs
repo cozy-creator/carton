@@ -8,8 +8,8 @@ use sui_move::build::Build as BuildPackage;
 use carton_core::{path, state::State};
 
 #[derive(Parser)]
-/// Build a move package
-#[clap(author, version)]
+/// Build a Move package
+#[clap(author, version, about)]
 pub struct Build {
     #[clap(flatten)]
     pub build: BuildPackage,

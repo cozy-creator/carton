@@ -9,6 +9,7 @@ use carton_core::{actions, path, state::State};
 
 #[derive(Parser)]
 #[clap(author, version)]
+/// Publish a Move package to the network
 pub struct Publish {
     #[clap(flatten)]
     build_config: BuildConfig,
@@ -18,8 +19,12 @@ pub struct Publish {
 
 #[derive(Parser)]
 pub struct PublishOptions {
+    /// Network environment where the package should be deployed to
+    /// If not provided, the env in Carton.toml will be used
     #[clap(long)]
     env: Option<String>,
+    /// Address of the account that should be used in publishing the package
+    /// If not provided, the address in Carton.toml will be used used
     #[clap(long)]
     publisher: Option<SuiAddress>,
     // /// ID of the gas object for gas payment, in 20 bytes Hex string
