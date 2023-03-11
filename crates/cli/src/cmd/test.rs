@@ -10,8 +10,8 @@ use move_unit_test::UnitTestingConfig;
 use sui_move::unit_test::Test as MoveTest;
 
 #[derive(Parser)]
-/// Run tests in a Move package
 #[clap(author, version)]
+/// Run tests in a Move package
 pub struct Test {
     #[clap(flatten)]
     pub test: MoveTest,

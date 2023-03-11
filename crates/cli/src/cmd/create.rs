@@ -8,6 +8,7 @@ use sui_move::new::New as NewPackage;
 use crate::template;
 
 #[derive(Parser)]
+#[clap(author, version)]
 /// Create a move package and initialize Carton.toml
 pub struct Create {
     #[clap(flatten)]

@@ -7,6 +7,7 @@ use carton_core::manifest;
 use crate::template;
 
 #[derive(Parser)]
+#[clap(author, version)]
 /// Initialize Carton.toml in an existing directory or package
 pub struct Init {
     /// Replace an existing Carton.toml file
