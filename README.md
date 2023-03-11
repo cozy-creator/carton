@@ -166,6 +166,37 @@ INCLUDING DEPENDENCY MoveStdlib
 BUILDING PackageName
 ```
 
+## Testing packages
+
+To test a package using Carton in a non-workspace project you can run:
+
+```sh
+carton test
+```
+
+and if you are in a workspace, you should specify the package name:
+
+```sh
+carton test --package PackageName
+```
+
+An example output of the test command is:
+
+```sh
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+UPDATING GIT DEPENDENCY https://github.com/MystenLabs/sui.git
+INCLUDING DEPENDENCY Sui
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING PackageName
+Running Move unit tests
+[ PASS    ] 0x0::module1_tests::test_something
+[ PASS    ] 0x0::module1_tests::test_anotherthing
+[ PASS    ] 0x0::module2_tests::some_other_test
+Test result: OK. Total tests: 3; passed: 3; failed: 0
+```
+
 ## Publishing packages
 
 To publish a package using Carton in a non-workspace project you can run:

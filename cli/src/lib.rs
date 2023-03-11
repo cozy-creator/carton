@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use cmd::{build::Build, create::Create, init::Init, publish::Publish};
+use cmd::{build::Build, create::Create, init::Init, publish::Publish, test::Test};
 
 pub mod cmd;
 pub mod template;
@@ -20,15 +20,17 @@ enum Command {
     Create(Create),
     Build(Build),
     Publish(Publish),
+    Test(Test),
 }
 
 pub async fn run_cli() -> Result<()> {
     let args = Arguments::parse();
 
     match args.cmd {
-        Command::Init(r) => r.execute(),
-        Command::Create(r) => r.execute(),
-        Command::Build(r) => r.execute(args.package).await,
-        Command::Publish(r) => r.execute(args.package).await,
+        Command::Init(c) => c.execute(),
+        Command::Create(c) => c.execute(),
+        Command::Build(c) => c.execute(args.package).await,
+        Command::Publish(c) => c.execute(args.package).await,
+        Command::Test(c) => c.execute(args.package).await,
     }
 }
