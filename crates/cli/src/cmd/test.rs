@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, process::Command};
 
 use anyhow::Result;
 use clap::Parser;
@@ -17,6 +17,8 @@ pub struct Test {
     pub test: MoveTest,
     #[clap(flatten)]
     pub build_config: BuildConfig,
+    #[clap(long)]
+    pub js: bool,
 }
 
 impl Test {
@@ -29,27 +31,50 @@ impl Test {
             None => env::current_dir()?,
         };
 
-        let Test { test, build_config } = self;
+        if self.js {
+            let mut output = Command::new("npx")
+                .arg("carton-test")
+                .env("NODE_URL", "https://fullnode.devnet.sui.io:443/")
+                .env(
+                    "PRIVATE_KEY",
+                    "AD3HOncCs0GkKmS0wRQHnlcb+FZXFCK455cRHs/ox4YI",
+                )
+                .current_dir(package_path.join("tests"))
+                // .stdout(Stdio::inherit())
+                // .stderr(Stdio::inherit())
+                .spawn()?;
 
-        let unit_test_config = UnitTestingConfig {
-            gas_limit: test.test.gas_limit,
-            filter: test.test.filter.clone(),
-            list: test.test.list,
-            num_threads: test.test.num_threads,
-            report_statistics: test.test.report_statistics.clone(),
-            report_storage_on_error: test.test.report_storage_on_error,
-            check_stackless_vm: test.test.check_stackless_vm,
-            verbose: test.test.verbose_mode,
+            // println!("{}", output.);
+            // output.stdout.unwrap();
 
-            ..UnitTestingConfig::default_with_bound(None)
-        };
+            // println!("{}", String::from_utf8(output.stdout.unwrap())?);
+            // println!("{}", String::from_utf8(output.stderr.unwrap())?);
 
-        if let UnitTestResult::Failure =
-            test.execute(Some(package_path), build_config, unit_test_config)?
-        {
-            std::process::exit(1)
+            let status = output.wait()?;
+            println!("{}", status)
+        } else {
+            let MoveTest { test } = &self.test;
+
+            let unit_test_config = UnitTestingConfig {
+                gas_limit: test.gas_limit,
+                filter: test.filter.clone(),
+                list: test.list,
+                num_threads: test.num_threads,
+                report_statistics: test.report_statistics.clone(),
+                report_storage_on_error: test.report_storage_on_error,
+                check_stackless_vm: test.check_stackless_vm,
+                verbose: test.verbose_mode,
+
+                ..UnitTestingConfig::default_with_bound(None)
+            };
+
+            if let UnitTestResult::Failure =
+                self.test
+                    .execute(Some(package_path), self.build_config, unit_test_config)?
+            {
+                std::process::exit(1)
+            }
         }
-
         Ok(())
     }
 }

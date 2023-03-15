@@ -33,13 +33,7 @@ pub async fn publish_package(
         .unwrap();
 
         response.effects.events.iter().for_each(|e| {
-            if let SuiEvent::Publish {
-                sender: _,
-                package_id,
-                version: _,
-                digest: _,
-            } = e
-            {
+            if let SuiEvent::Publish { package_id, .. } = e {
                 writeln!(&mut w, "Package ID: {}", package_id).unwrap()
             }
         });
