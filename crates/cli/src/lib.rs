@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use cmd::{build::Build, create::Create, init::Init, publish::Publish, test::Test};
+use cmd::{build::Build, create::Create, init::Init, publish::Publish, run::Run, test::Test};
 
 pub mod cmd;
 pub mod template;
@@ -21,6 +21,7 @@ enum Command {
     Build(Build),
     Publish(Publish),
     Test(Test),
+    Run(Run),
 }
 
 pub async fn run_cli() -> Result<()> {
@@ -32,5 +33,6 @@ pub async fn run_cli() -> Result<()> {
         Command::Build(c) => c.execute(args.package).await,
         Command::Publish(c) => c.execute(args.package).await,
         Command::Test(c) => c.execute(args.package).await,
+        Command::Run(c) => c.execute(args.package).await,
     }
 }
