@@ -1,20 +1,26 @@
 {
-  "name": "carton",
-  "version": "0.0.1-alpha",
-  "main": "index.js",
+  "name": "sui-carton",
+  "version": "0.0.2-alpha",
+  "main": "./dist/src/index.js",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
   "devDependencies": {
     "@types/minimist": "^1.2.2",
-    "@types/mocha": "^10.0.1",
-    "typescript": "^4.9.5"
+    "@types/mocha": "^10.0.1"
   },
   "dependencies": {
     "@mysten/sui.js": "^0.28.0",
+    "minimist": "^1.2.8",
     "mocha": "^10.2.0",
-    "toml": "^3.0.0"
+    "toml": "^3.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
   },
   "bin": {
-    "carton-test": "./dist/bin/test.js"
+    "carton-test": "./dist/bin/test.js",
+    "carton-run": "./dist/bin/run.js"
   },
   "engines": {
     "node": ">=16"

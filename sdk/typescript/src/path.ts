@@ -2,7 +2,7 @@ import path from "path";
 import fsp from "fs/promises";
 import fs from "fs";
 
-export async function getPathFiles(dirPath: string, ext: string) {
+export async function getPathFiles(dirPath: string, ext: string[]) {
   const dir = await fsp.readdir(dirPath);
   let files: string[] = [];
 
@@ -11,7 +11,7 @@ export async function getPathFiles(dirPath: string, ext: string) {
     const stat = await fsp.stat(filePath);
 
     if (stat.isFile()) {
-      if (ext == path.extname(filePath)) {
+      if (ext.includes(path.extname(filePath))) {
         files.push(filePath);
       }
     } else {

@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import toml from "toml";
+import minimist from "minimist";
 import { getRootPath } from "./path";
 
 export function parseManifest() {
@@ -9,4 +10,8 @@ export function parseManifest() {
 
   const tomlString = fs.readFileSync(cartonPath, { encoding: "utf-8" });
   return toml.parse(tomlString);
+}
+
+export function parseArgs<T>(args: string[], opts?: minimist.Opts) {
+  return minimist<T>(args, opts);
 }
