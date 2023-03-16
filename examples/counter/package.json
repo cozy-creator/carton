@@ -1,0 +1,10 @@
+{
+  "name": "counter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@mysten/sui.js": "^0.29.1",
+    "sui-carton": "^0.0.2-alpha"
+  }
+}

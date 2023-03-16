@@ -1,0 +1,9 @@
+
+[provider]
+address = "0xaabf35dabd9a05100b6d794558ec75be5899c588"
+env = "devnet"
+config = "~/.sui/sui_config/client.yaml"
+
+[envs]
+devnet = { url = "https://fullnode.devnet.vincagame.com:443/" }
+testnet = { url = "https://fullnode.testnet.sui.io:443/" }
