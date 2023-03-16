@@ -1,11 +1,16 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Ok, Result};
+use fastcrypto::encoding::Base64;
 use sui::{
     client_commands::WalletContext,
     config::{PersistedConfig, SuiClientConfig, SuiEnv},
 };
-use sui_types::base_types::SuiAddress;
+use sui_keys::keystore::AccountKeystore;
+use sui_types::{
+    base_types::SuiAddress,
+    crypto::{SuiKeyPair, ToFromBytes},
+};
 
 use crate::manifest::{Envs, Manifest};
 
@@ -42,6 +47,22 @@ impl State {
         } else {
             bail!("Cannot specify package in a non workspace project")
         }
+    }
+    pub fn get_active_private_key(&mut self) -> Result<String> {
+        let address = self.context.active_address()?;
+        let key = self.context.config.keystore.get_key(&address)?;
+
+        let key_bytes = match key {
+            SuiKeyPair::Ed25519(kp) => kp.as_bytes(),
+            SuiKeyPair::Secp256k1(kp) => kp.as_bytes(),
+            SuiKeyPair::Secp256r1(kp) => kp.as_bytes(),
+        };
+
+        Ok(Base64::from_bytes(key_bytes).encoded())
+    }
+
+    pub fn get_active_env(&self) -> Result<&SuiEnv> {
+        self.context.config.get_active_env()
     }
 }
 

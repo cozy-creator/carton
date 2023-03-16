@@ -1,6 +1,9 @@
-use std::{env, process::Command};
+use std::{
+    env,
+    process::{self, Command, Stdio},
+};
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use clap::Parser;
 use move_package::BuildConfig;
 
@@ -24,34 +27,34 @@ pub struct Test {
 impl Test {
     pub async fn execute(self, package: Option<String>) -> Result<()> {
         let root_path = path::get_root_path()?;
-        let state = State::load(&root_path).await?;
+        let mut state = State::load(&root_path).await?;
 
         let package_path = match package {
             Some(package) => state.get_package_path(package)?,
             None => env::current_dir()?,
         };
 
+        let private = state.get_active_private_key()?;
+        let env = state.get_active_env()?;
+
         if self.js {
+            // TODO: add tests path to manifest
+            let tests_path = package_path.join("tests");
+            if !tests_path.is_dir() {
+                bail!("Unable to find tests directory")
+            }
+
             let mut output = Command::new("npx")
                 .arg("carton-test")
-                .env("NODE_URL", "https://fullnode.devnet.sui.io:443/")
-                .env(
-                    "PRIVATE_KEY",
-                    "AD3HOncCs0GkKmS0wRQHnlcb+FZXFCK455cRHs/ox4YI",
-                )
-                .current_dir(package_path.join("tests"))
-                // .stdout(Stdio::inherit())
-                // .stderr(Stdio::inherit())
+                .env("NODE_URL", env.rpc.as_str())
+                .env("PRIVATE_KEY", private)
+                .current_dir(tests_path)
+                .stdout(Stdio::inherit())
+                .stderr(Stdio::inherit())
                 .spawn()?;
 
-            // println!("{}", output.);
-            // output.stdout.unwrap();
-
-            // println!("{}", String::from_utf8(output.stdout.unwrap())?);
-            // println!("{}", String::from_utf8(output.stderr.unwrap())?);
-
             let status = output.wait()?;
-            println!("{}", status)
+            process::exit(status.code().unwrap())
         } else {
             let MoveTest { test } = &self.test;
 

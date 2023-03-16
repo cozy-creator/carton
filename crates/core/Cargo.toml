@@ -11,6 +11,7 @@ toml = "0.7.2"
 sui = { git = "https://github.com/MystenLabs/sui", rev = "f5e66118e3fc80b2fb330444834a85b8aa9896ad"  }
 sui-keys = { git = "https://github.com/MystenLabs/sui", rev = "f5e66118e3fc80b2fb330444834a85b8aa9896ad"  }
 sui-json-rpc-types = { git = "https://github.com/MystenLabs/sui", rev = "f5e66118e3fc80b2fb330444834a85b8aa9896ad"  }
+fastcrypto = { git = "https://github.com/MystenLabs/fastcrypto", rev = "d96eee87465f02976eeb1ae3ceeba57b7d8bfe4b" }
 
 sui-types.workspace = true
 anyhow.workspace = true
