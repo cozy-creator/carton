@@ -13,7 +13,7 @@ pub fn run_js_script(
     private_key: &str,
     node_url: &str,
 ) -> Result<()> {
-    let script_file = scripts_path.join(format!("{}", script));
+    let script_file = scripts_path.join(script);
     if !script_file.is_file() {
         bail!("Script file {} could not be found", script)
     }
