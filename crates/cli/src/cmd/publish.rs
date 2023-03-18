@@ -3,9 +3,13 @@ use std::env;
 use anyhow::{Ok, Result};
 use clap::Parser;
 use move_package::BuildConfig;
-use sui_types::base_types::SuiAddress;
+use sui_types::base_types::{ObjectID, SuiAddress};
 
-use carton_core::{actions, path, state::State};
+use carton_core::{
+    actions::publish::{self as publish_action, PublishOptions},
+    path,
+    state::State,
+};
 
 #[derive(Parser)]
 #[clap(author, version)]
@@ -13,37 +17,34 @@ use carton_core::{actions, path, state::State};
 pub struct Publish {
     #[clap(flatten)]
     build_config: BuildConfig,
-    #[clap(flatten)]
-    options: PublishOptions,
-}
 
-#[derive(Parser)]
-pub struct PublishOptions {
     /// Network environment where the package should be deployed to
     /// If not provided, the env in Carton.toml will be used
     #[clap(long)]
     env: Option<String>,
+
     /// Address of the account that should be used in publishing the package
     /// If not provided, the address in Carton.toml will be used used
     #[clap(long)]
     publisher: Option<SuiAddress>,
-    // /// ID of the gas object for gas payment, in 20 bytes Hex string
-    // /// If not provided, a gas object with at least gas_budget value will be selected
-    // #[clap(long)]
-    // gas: Option<ObjectID>,
 
-    // /// Gas budget for running module initializers
-    // #[clap(long)]
-    // gas_budget: u64,
+    /// ID of the gas object for gas payment, in 20 bytes Hex string
+    /// If not provided, a gas object with at least gas_budget value will be selected
+    #[clap(long)]
+    gas: Option<ObjectID>,
 
-    // /// Publish the package without checking whether compiling dependencies from source results
-    // /// in bytecode matching the dependencies found on-chain.
-    // #[clap(long)]
-    // skip_dependency_verification: bool,
+    /// Gas budget for running module initializers
+    #[clap(long)]
+    gas_budget: u64,
 
-    // /// Also publish transitive dependencies that have not already been published.
-    // #[clap(long)]
-    // with_unpublished_dependencies: bool,
+    /// Publish the package without checking whether compiling dependencies from source results
+    /// in bytecode matching the dependencies found on-chain.
+    #[clap(long)]
+    skip_dependency_verification: bool,
+
+    /// Also publish transitive dependencies that have not already been published.
+    #[clap(long)]
+    with_unpublished_dependencies: bool,
 }
 
 impl Publish {
@@ -51,11 +52,11 @@ impl Publish {
         let root_path = path::get_root_path()?;
         let mut state = State::load(&root_path).await?;
 
-        if let Some(env) = self.options.env {
+        if let Some(env) = self.env {
             state.set_active_env(&env);
         }
 
-        if let Some(publisher) = self.options.publisher {
+        if let Some(publisher) = self.publisher {
             state.set_active_address(publisher);
         }
 
@@ -64,7 +65,14 @@ impl Publish {
             None => env::current_dir()?,
         };
 
-        actions::publish_package(package_path, &mut state.context, self.build_config).await?;
+        let options = PublishOptions {
+            gas: self.gas,
+            gas_budget: self.gas_budget,
+            skip_dependency_verification: self.skip_dependency_verification,
+            with_unpublished_dependencies: self.with_unpublished_dependencies,
+        };
+
+        publish_action::run(package_path, options, self.build_config, &mut state.context).await?;
 
         Ok(())
     }

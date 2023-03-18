@@ -6,21 +6,30 @@ use colored::Colorize;
 use move_package::BuildConfig;
 use sui::client_commands::{SuiClientCommandResult, SuiClientCommands, WalletContext};
 use sui_json_rpc_types::{SuiEvent, SuiTransactionResponse};
+use sui_types::base_types::ObjectID;
 
-pub async fn publish_package(
+pub struct PublishOptions {
+    pub gas: Option<ObjectID>,
+    pub gas_budget: u64,
+    pub skip_dependency_verification: bool,
+    pub with_unpublished_dependencies: bool,
+}
+
+pub async fn run(
     package_path: PathBuf,
-    context: &mut WalletContext,
+    options: PublishOptions,
     build_config: BuildConfig,
+    context: &mut WalletContext,
 ) -> Result<SuiTransactionResponse> {
     let mut w = io::stdout();
 
     let command = SuiClientCommands::Publish {
         package_path,
         build_config,
-        gas: None,
-        gas_budget: 30000,
-        skip_dependency_verification: true,
-        with_unpublished_dependencies: true,
+        gas: options.gas,
+        gas_budget: options.gas_budget,
+        skip_dependency_verification: options.skip_dependency_verification,
+        with_unpublished_dependencies: options.with_unpublished_dependencies,
     };
 
     let result = command.execute(context).await?;
@@ -89,6 +98,6 @@ pub async fn publish_package(
 
         Ok(response)
     } else {
-        bail!("")
+        bail!("Could not publish package")
     }
 }
