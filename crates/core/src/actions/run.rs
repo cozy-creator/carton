@@ -19,7 +19,7 @@ pub fn run_js_script(
     }
 
     let mut output = Command::new(constants::NPX_CMD)
-        .arg(constants::CARTON_TEST)
+        .arg(constants::CARTON_RUN)
         .arg(format!(
             "--file={}",
             script_file.canonicalize()?.to_str().unwrap()
