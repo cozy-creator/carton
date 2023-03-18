@@ -12,6 +12,9 @@ sui = { git = "https://github.com/MystenLabs/sui", rev = "f5e66118e3fc80b2fb3304
 sui-keys = { git = "https://github.com/MystenLabs/sui", rev = "f5e66118e3fc80b2fb330444834a85b8aa9896ad"  }
 sui-json-rpc-types = { git = "https://github.com/MystenLabs/sui", rev = "f5e66118e3fc80b2fb330444834a85b8aa9896ad"  }
 fastcrypto = { git = "https://github.com/MystenLabs/fastcrypto", rev = "d96eee87465f02976eeb1ae3ceeba57b7d8bfe4b" }
+move-unit-test = { git = "https://github.com/move-language/move", rev = "7343821f67c070d28dcdb5bf7d2e07ced046b52f" }
+sui-move = { git = "https://github.com/MystenLabs/sui", features = ["build", "unit_test"], rev = "2062d2f34912c84fc699f1a2a6e1d485c7f56f79" }
+move-cli = { git = "https://github.com/move-language/move", rev = "7343821f67c070d28dcdb5bf7d2e07ced046b52f" }
 
 sui-types.workspace = true
 anyhow.workspace = true

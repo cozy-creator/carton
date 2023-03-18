@@ -1,14 +1,9 @@
-use std::{
-    env,
-    process::{self, Command},
-};
+use std::env;
 
 use anyhow::{bail, Result};
 use clap::Parser;
 
-use carton_core::{path, state::State};
-
-use crate::constants;
+use carton_core::{actions::run as run_action, path, state::State};
 
 #[derive(Parser)]
 #[clap(author, version)]
@@ -35,25 +30,9 @@ impl Run {
             bail!("Unable to find scripts directory")
         }
 
-        let script_file = scripts_path.join(format!("{}", self.script));
-        if !script_file.is_file() {
-            bail!("Script file {} could not be found", self.script)
-        }
-
         let private_key = state.get_active_private_key()?;
         let env = state.get_active_env()?;
 
-        let mut output = Command::new(constants::NPX_CMD)
-            .arg(constants::CARTON_TEST)
-            .arg(format!(
-                "--file={}",
-                script_file.canonicalize()?.to_str().unwrap()
-            ))
-            .env(constants::NODE_URL_ARG, env.rpc.as_str())
-            .env(constants::PRIVATE_KEY_ARG, private_key)
-            .spawn()?;
-
-        let status = output.wait()?;
-        process::exit(status.code().unwrap())
+        run_action::run_js_script(&scripts_path, &self.script, &private_key, env.rpc.as_str())
     }
 }

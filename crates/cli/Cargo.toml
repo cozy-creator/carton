@@ -10,8 +10,6 @@ carton-core = { path = "../core" }
 clap = { version = "3.2.17", features = ["derive"] }
 tokio = { version = "1.26.0", features = ["full"] }
 sui-move = { git = "https://github.com/MystenLabs/sui", features = ["build", "unit_test"], rev = "2062d2f34912c84fc699f1a2a6e1d485c7f56f79" }
-move-unit-test = { git = "https://github.com/move-language/move", rev = "7343821f67c070d28dcdb5bf7d2e07ced046b52f" }
-move-cli = { git = "https://github.com/move-language/move", rev = "7343821f67c070d28dcdb5bf7d2e07ced046b52f" }
 
 anyhow.workspace = true
 move-package.workspace = true
