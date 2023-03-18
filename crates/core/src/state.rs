@@ -48,6 +48,7 @@ impl State {
             bail!("Cannot specify package in a non workspace project")
         }
     }
+
     pub fn get_active_private_key(&mut self) -> Result<String> {
         let address = self.context.active_address()?;
         let key = self.context.config.keystore.get_key(&address)?;

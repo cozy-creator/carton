@@ -1,12 +1,14 @@
 use std::{
     env,
-    process::{self, Command, Stdio},
+    process::{self, Command},
 };
 
 use anyhow::{bail, Result};
 use clap::Parser;
 
 use carton_core::{path, state::State};
+
+use crate::constants;
 
 #[derive(Parser)]
 #[clap(author, version)]
@@ -27,9 +29,6 @@ impl Run {
             None => env::current_dir()?,
         };
 
-        let private = state.get_active_private_key()?;
-        let env = state.get_active_env()?;
-
         // TODO: add scripts path to manifest
         let scripts_path = package_path.join("scripts");
         if !scripts_path.is_dir() {
@@ -41,16 +40,17 @@ impl Run {
             bail!("Script file {} could not be found", self.script)
         }
 
-        let mut output = Command::new("npx")
-            .arg("carton-run")
+        let private_key = state.get_active_private_key()?;
+        let env = state.get_active_env()?;
+
+        let mut output = Command::new(constants::NPX_CMD)
+            .arg(constants::CARTON_TEST)
             .arg(format!(
                 "--file={}",
                 script_file.canonicalize()?.to_str().unwrap()
             ))
-            .env("NODE_URL", env.rpc.as_str())
-            .env("PRIVATE_KEY", private)
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
+            .env(constants::NODE_URL_ARG, env.rpc.as_str())
+            .env(constants::PRIVATE_KEY_ARG, private_key)
             .spawn()?;
 
         let status = output.wait()?;

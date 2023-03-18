@@ -1,6 +1,6 @@
 use std::{
     env,
-    process::{self, Command, Stdio},
+    process::{self, Command},
 };
 
 use anyhow::{bail, Result};
@@ -11,6 +11,8 @@ use carton_core::{path, state::State};
 use move_cli::base::test::UnitTestResult;
 use move_unit_test::UnitTestingConfig;
 use sui_move::unit_test::Test as MoveTest;
+
+use crate::constants;
 
 #[derive(Parser)]
 #[clap(author, version)]
@@ -34,9 +36,6 @@ impl Test {
             None => env::current_dir()?,
         };
 
-        let private = state.get_active_private_key()?;
-        let env = state.get_active_env()?;
-
         if self.js {
             // TODO: add tests path to manifest
             let tests_path = package_path.join("tests");
@@ -44,13 +43,14 @@ impl Test {
                 bail!("Unable to find tests directory")
             }
 
-            let mut output = Command::new("npx")
-                .arg("carton-test")
-                .env("NODE_URL", env.rpc.as_str())
-                .env("PRIVATE_KEY", private)
+            let private_key = state.get_active_private_key()?;
+            let env = state.get_active_env()?;
+
+            let mut output = Command::new(constants::NPX_CMD)
+                .arg(constants::CARTON_TEST)
+                .env(constants::NODE_URL_ARG, env.rpc.as_str())
+                .env(constants::PRIVATE_KEY_ARG, private_key)
                 .current_dir(tests_path)
-                .stdout(Stdio::inherit())
-                .stderr(Stdio::inherit())
                 .spawn()?;
 
             let status = output.wait()?;
@@ -67,7 +67,6 @@ impl Test {
                 report_storage_on_error: test.report_storage_on_error,
                 check_stackless_vm: test.check_stackless_vm,
                 verbose: test.verbose_mode,
-
                 ..UnitTestingConfig::default_with_bound(None)
             };
 
@@ -75,9 +74,10 @@ impl Test {
                 self.test
                     .execute(Some(package_path), self.build_config, unit_test_config)?
             {
-                std::process::exit(1)
+                process::exit(1)
             }
         }
+
         Ok(())
     }
 }
