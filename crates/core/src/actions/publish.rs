@@ -15,7 +15,7 @@ pub struct PublishOptions {
     pub with_unpublished_dependencies: bool,
 }
 
-pub async fn run(
+pub async fn publish_package(
     package_path: PathBuf,
     options: PublishOptions,
     build_config: BuildConfig,

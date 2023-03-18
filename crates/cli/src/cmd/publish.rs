@@ -72,7 +72,13 @@ impl Publish {
             with_unpublished_dependencies: self.with_unpublished_dependencies,
         };
 
-        publish_action::run(package_path, options, self.build_config, &mut state.context).await?;
+        publish_action::publish_package(
+            package_path,
+            options,
+            self.build_config,
+            &mut state.context,
+        )
+        .await?;
 
         Ok(())
     }
